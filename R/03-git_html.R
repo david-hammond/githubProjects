@@ -21,7 +21,7 @@
 
 git_html = function(projects){
  all <- projects %>%
-  filter(!is.na(Due)) %>%
+  filter(!is.na(Due), Status != "Done") %>%
   group_by(project, title, url, Status, Due) %>%
   summarise(
     # Make lists at deepest point
