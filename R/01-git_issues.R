@@ -94,10 +94,7 @@ git_issues = function(projects){
   if(!("Due" %in% names(res))){
     res$Due = NA
   }
-  res = res %>% res %>% replace_na(Status, "To Do")
-  if(class(res)[[1]] == "try-error"){
-    message(paste("Check that all tasks have a status and at least one has a due date in ",projects$title[1]))
-    res = NULL
-  }
+  res = res %>% mutate(Status = replace_na(Status, "To Do"))
+  res = res %>% select(project, id, title, login, url, Status, Due)
   return(res)
 }
