@@ -24,5 +24,6 @@ git_schedule = function(token, org){
     res = git_issues(projects[i,])
     all = all %>% rbind(res)
   }
+  all = all %>% mutate(Due = as.Date(Due))
   return(all)
 }

@@ -7,7 +7,7 @@
 #'
 #' @importFrom ghql Query GraphqlClient
 #' @importFrom dplyr filter relocate select mutate rename as_tibble n
-#' @importFrom tidyr spread unnest
+#' @importFrom tidyr spread unnest replace_na
 #' @importFrom jsonlite fromJSON
 #'
 #'
@@ -88,6 +88,13 @@ git_issues = function(projects){
               spread(name, value) %>%
               mutate(id = 1:n(), project = projects$title[1]) %>%
               relocate(project))
+  if(!("Status" %in% names(res))){
+    res$Status = "To Do"
+  }
+  if(!("Due" %in% names(res))){
+    res$Due = NA
+  }
+  res = res %>% res %>% replace_na(Status, "To Do")
   if(class(res)[[1]] == "try-error"){
     message(paste("Check that all tasks have a status and at least one has a due date in ",projects$title[1]))
     res = NULL
