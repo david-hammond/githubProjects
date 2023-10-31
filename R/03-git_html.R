@@ -20,8 +20,9 @@
 
 
 git_html = function(projects){
+ statuses = c("To Do", "Working On", "Review", "Done")
  all <- projects %>%
-  filter(!is.na(Due), Status != "Done") %>%
+  filter(!is.na(Due)) %>%
   group_by(project, title, url, Status, Due) %>%
   summarise(
     # Make lists at deepest point
@@ -29,13 +30,16 @@ git_html = function(projects){
     .groups = "drop_last"
   ) %>%
   ungroup() %>%
-  mutate(Status = p(Status)) %>%
+  mutate(Status = factor(Status, statuses, ordered = T)) %>%
+  arrange(Status) %>%
+  mutate(Status = p(as.character(Status))) %>%
   transform(url = paste('<a href = ', shQuote(url), '>', title, '</a>')) %>%
   gather(type, html, - c(project, Due, title)) %>%
   mutate(type = factor(type, unique(type, ordered = T))) %>%
   group_by(project,Due, title) %>%
   arrange(type) %>%
   summarise(body = (li_flatten(na.omit(html)))) %>%
+  summarise(body = ifelse(grepl("<p>Done</p>", body), s(body), body)) %>%
   group_by(project,Due) %>%
   summarise(body = div(li_flatten(na.omit(body)))) %>%
   select(project, body, Due) %>%
@@ -65,6 +69,7 @@ ul <- make_html_tag("ul")
 li <- make_html_tag("li")
 p  <- make_html_tag("p")
 div  <- make_html_tag("div")
+s <- make_html_tag("s")
 
 # tag elements as li's and flatten
 li_flatten <- function(xs) {
