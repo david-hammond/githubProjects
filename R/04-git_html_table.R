@@ -36,7 +36,7 @@ git_html_table = function(projects){
    mutate(task = cell_spec(title, "html", link = url)) %>%
    select(project, task, Status, staff, Due) %>%
    arrange((Due)) %>%
-   filter(Due >= today()) %>%
+   filter(Due >= today() | Status != "Done") %>%
    mutate(bizdays_to_go = bizdays(from = today(), to = Due, "Actual")) %>%
    mutate(Due = format(Due, "%a %d-%b-%y"))
  remove_calendars("Actual")
