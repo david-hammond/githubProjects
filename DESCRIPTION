@@ -15,4 +15,7 @@ Imports:
     magrittr,
     ghql,
     dplyr,
-    jsonlite
+    jsonlite,
+    lubridate,
+    bizdays,
+    kableExtra

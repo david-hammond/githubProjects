@@ -19,7 +19,7 @@
 
 
 
-git_html = function(projects){
+git_html_calendar = function(projects){
  statuses = c("To Do", "Working On", "Review", "Done")
  all <- projects %>%
   filter(!is.na(Due)) %>%
