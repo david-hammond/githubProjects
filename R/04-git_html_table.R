@@ -23,7 +23,7 @@
 
 git_html_table = function(projects){
  statuses = c("To Do", "Working On", "Review", "Done")
- create.calendar("Actual")
+ create.calendar("Actual", weekdays=c("saturday", "sunday"))
  all <- projects %>%
    group_by(project, title, url, Status, Due) %>%
    summarise(
