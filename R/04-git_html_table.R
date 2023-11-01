@@ -43,21 +43,3 @@ git_html_table = function(projects){
   return(all)
 }
 
-make_html_tag <- function(tag) {
-  left  <- sprintf("<%s>",  tag)
-  right <- sprintf("</%s>", tag)
-  function(xs) {
-    ifelse(!is.na(xs), paste0(left, xs, right), NA_character_)
-  }
-}
-
-ul <- make_html_tag("ul")
-li <- make_html_tag("li")
-p  <- make_html_tag("p")
-div  <- make_html_tag("div")
-s <- make_html_tag("s")
-
-# tag elements as li's and flatten
-li_flatten <- function(xs) {
-  stringr::str_flatten((xs), "\n")
-}
