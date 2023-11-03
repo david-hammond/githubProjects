@@ -73,28 +73,39 @@ git_issues = function(projects){
     headers = list(Authorization = paste0("Bearer ", projects$token[1]))
   )
   res = fromJSON(con$exec(qry$queries$query))
-  res = try(res$data$node$items$nodes %>% as_tibble() %>%
-              unnest(fieldValues, keep_empty = T) %>%
-              unnest(nodes, keep_empty = T) %>%
-              rename(type = name) %>%
-              unnest(field, keep_empty = T) %>%
-              unnest(content, keep_empty = T) %>%
-              unnest(assignees, keep_empty = T) %>%
-              unnest(nodes, keep_empty = T) %>%
-              mutate(value = ifelse(is.na(type), date, type)) %>%
-              select(id, title, login, url, value, name)  %>%
-              filter(name %in% c('Status', "Due")) %>%
-              mutate(name = factor(name, na.omit(unique(name)), ordered = T)) %>%
-              spread(name, value) %>%
-              mutate(id = 1:n(), project = projects$title[1]) %>%
-              relocate(project))
-  if(!("Status" %in% names(res))){
-    res$Status = "To Do"
+  res = res$data$node$items$nodes %>% as_tibble()
+  if(nrow(res) == 0){
+    res = NULL
+  }else{
+    res = try(res$data$node$items$nodes %>% as_tibble() %>%
+                unnest(fieldValues, keep_empty = T) %>%
+                unnest(nodes, keep_empty = T) %>%
+                rename(type = name) %>%
+                unnest(field, keep_empty = T) %>%
+                unnest(content, keep_empty = T) %>%
+                unnest(assignees, keep_empty = T) %>%
+                unnest(nodes, keep_empty = T) %>%
+                mutate(value = ifelse(is.na(type), date, type)) %>%
+                select(id, title, login, url, value, name)  %>%
+                filter(name %in% c('Status', "Due")) %>%
+                mutate(name = factor(name, na.omit(unique(name)), ordered = T)) %>%
+                spread(name, value) %>%
+                mutate(id = 1:n(), project = projects$title[1]) %>%
+                relocate(project))
+    if(class(res) != "try-catch"){
+      if(!("Status" %in% names(res))){
+        res$Status = "To Do"
+      }
+      if(!("Due" %in% names(res))){
+        res$Due = NA
+      }
+      res = res %>% mutate(Status = replace_na(Status, "To Do"))
+      res = res %>% select(project, id, title, login, url, Status, Due)
+    }else{
+      res = NULL
+    }
+
   }
-  if(!("Due" %in% names(res))){
-    res$Due = NA
-  }
-  res = res %>% mutate(Status = replace_na(Status, "To Do"))
-  res = res %>% select(project, id, title, login, url, Status, Due)
+
   return(res)
 }
