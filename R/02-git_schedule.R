@@ -19,7 +19,6 @@
 git_schedule = function(token, org){
   projects = git_projects(token, org)  %>%
     filter(!template, !closed)
-  all = NULL
   projects = split(projects, projects$id)
   cores <- max(c(1, detectCores()-1))
   cl <- makeCluster(cores)

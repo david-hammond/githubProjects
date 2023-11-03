@@ -77,7 +77,7 @@ git_issues = function(projects){
   if(nrow(res) == 0){
     res = NULL
   }else{
-    res = try(res$data$node$items$nodes %>% as_tibble() %>%
+    res = try(res %>%
                 unnest(fieldValues, keep_empty = T) %>%
                 unnest(nodes, keep_empty = T) %>%
                 rename(type = name) %>%
@@ -92,7 +92,7 @@ git_issues = function(projects){
                 spread(name, value) %>%
                 mutate(id = 1:n(), project = projects$title[1]) %>%
                 relocate(project))
-    if(class(res) != "try-catch"){
+    if(class(res)[1] != "try-catch"){
       if(!("Status" %in% names(res))){
         res$Status = "To Do"
       }
