@@ -85,14 +85,17 @@ git_issues = function(projects){
                 unnest(content, keep_empty = T) %>%
                 unnest(assignees, keep_empty = T) %>%
                 unnest(nodes, keep_empty = T) %>%
-                mutate(value = ifelse(is.na(type), date, type)) %>%
-                select(id, title, login, url, value, name)  %>%
-                filter(name %in% c('Status', "Due")) %>%
-                mutate(name = factor(name, na.omit(unique(name)), ordered = T)) %>%
-                spread(name, value) %>%
-                mutate(id = 1:n(), project = projects$title[1]) %>%
-                relocate(project))
+                mutate(value = ifelse(is.na(type), date, type)))
     if(class(res)[1] != "try-catch"){
+      if(!"url" %in% names(res)){
+        res$url = "No repo assigned"
+        res = res %>%
+          select(id, title, login, url, value, name) %>%
+          filter(name %in% c("Status", "Due")) %>%
+          mutate(name = factor(name, na.omit(unique(name)), ordered = T)) %>%
+          spread(name, value) %>% mutate(id = 1:n(), project = projects$title[1]) %>%
+          relocate(project)
+      }
       if(!("Status" %in% names(res))){
         res$Status = "To Do"
       }
